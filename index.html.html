@@ -1,0 +1,416 @@
+<lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Viaje a Guadalajara 2026</title>
+  <style>
+    :root {
+      --primary: #d97706; /* Color cempasúchil */
+      --primary-dark: #b45309;
+      --bg: #f3f4f6;
+      --surface: #ffffff;
+      --text: #1f2937;
+      --text-muted: #6b7280;
+      --accent: #2563eb;
+      --radius: 16px;
+      --shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+    }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background-color: var(--bg); color: var(--text); padding-bottom: 80px; }
+
+    /* Hero App Header */
+    .hero {
+      background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1518105779142-d971f22818c4?auto=format&fit=crop&w=1000&q=80') center/cover;
+      color: white;
+      padding: 40px 20px 20px;
+      border-bottom-left-radius: 24px;
+      border-bottom-right-radius: 24px;
+      box-shadow: var(--shadow);
+      position: relative;
+    }
+    .hero h1 { font-size: 1.8rem; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 5px; }
+    .hero p { font-size: 0.95rem; opacity: 0.9; }
+
+    /* Tab Navigation */
+    .tabs-container {
+      display: flex;
+      overflow-x: auto;
+      padding: 15px 20px;
+      gap: 10px;
+      scrollbar-width: none; /* Firefox */
+    }
+    .tabs-container::-webkit-scrollbar { display: none; } /* Safari/Chrome */
+    .tab {
+      background: #e5e7eb;
+      color: var(--text-muted);
+      border: none;
+      padding: 10px 20px;
+      border-radius: 30px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.3s ease;
+    }
+    .tab.active { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(217, 119, 6, 0.4); }
+
+    /* Main Content Area */
+    .content-area { padding: 0 20px; }
+    .day-panel { display: none; animation: fadeIn 0.4s ease-out forwards; }
+    .day-panel.active { display: block; }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Info Cards */
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+    .card-img-header {
+      margin: -16px -16px 16px -16px;
+      height: 160px;
+      background-size: cover;
+      background-position: center;
+    }
+    
+    .badge {
+      display: inline-block;
+      background: #fef3c7;
+      color: var(--primary-dark);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 20px;
+      margin-bottom: 8px;
+    }
+    .card h3 { font-size: 1.25rem; margin-bottom: 6px; }
+    .card p { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 15px; }
+
+    /* Action Buttons */
+    .actions { display: flex; flex-direction: column; gap: 8px; }
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.1s;
+      width: 100%;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-maps { background: #eff6ff; color: var(--accent); }
+    .btn-uber { background: #000000; color: #ffffff; }
+    .btn-copy { background: #f3f4f6; color: var(--text); border: 1px solid #e5e7eb; }
+
+    /* Utilities (GPS, Home Base) */
+    .utils-section { margin-bottom: 25px; }
+    .gps-card { border: 2px solid var(--accent); background: #f8fafc; }
+    #gps-status { font-size: 0.85rem; margin-top: 10px; color: var(--accent); font-weight: 500;}
+
+    /* Interactive Checklist */
+    .checklist-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .checklist-item input { width: 22px; height: 22px; accent-color: var(--primary); margin-top: 2px; flex-shrink: 0; }
+    .checklist-label { font-size: 0.95rem; color: var(--text); line-height: 1.3; }
+    .checklist-item.done .checklist-label { text-decoration: line-through; color: var(--text-muted); }
+
+  </style>
+</head>
+<body>
+
+  <!-- Hero Section -->
+  <header class="hero">
+    <h1>Guadalajara 2026</h1>
+    <p>Rock, Flores y Gastronomía Tapatía</p>
+  </header>
+
+  <!-- Pestañas de Navegación -->
+  <nav class="tabs-container" id="tabs">
+    <button class="tab active" onclick="showTab('info')">Info Útil</button>
+    <button class="tab" onclick="showTab('dia1')">Jue 22</button>
+    <button class="tab" onclick="showTab('dia2')">Vie 23</button>
+    <button class="tab" onclick="showTab('dia3')">Sáb 24</button>
+    <button class="tab" onclick="showTab('dia4')">Dom 25</button>
+    <button class="tab" onclick="showTab('dia5')">Lun 26</button>
+    <button class="tab" onclick="showTab('dia6')">Mar 27</button>
+  </nav>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="content-area">
+
+    <!-- TAB: INFO ÚTIL & HERRAMIENTAS -->
+    <section id="info" class="day-panel active">
+      <div class="card gps-card">
+        <h3>📍 GPS Dinámico</h3>
+        <p>Activa el GPS para que los botones de "Pedir Uber" o "Ver Ruta" calculen la distancia desde tu ubicación exacta en tiempo real.</p>
+        <button class="btn btn-maps" style="background: var(--accent); color: white;" onclick="activarGPS()">
+          📡 Detectar mi ubicación
+        </button>
+        <div id="gps-status">GPS inactivo. Usando Casa Manuel como punto de partida.</div>
+      </div>
+
+      <div class="card">
+        <span class="badge">🏠 Base de Operaciones</span>
+        <h3>Casa Manuel</h3>
+        <p id="casa-direccion">Tierra encantada 3060, Terralta, Tlaquepaque Jalisco 45594</p>
+        <div class="actions">
+          <button class="btn btn-copy" onclick="copiarDireccion()">📋 Copiar Dirección</button>
+          <a class="btn btn-maps" href="https://www.google.com/maps/search/?api=1&query=Tierra+encantada+3060+Terralta+Tlaquepaque+Jalisco+45594" target="_blank">🗺️ Ver en Maps</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <span class="badge">✈️ Volaris</span>
+        <h3>Itinerario de Vuelo</h3>
+        <p><strong>Ida (Jue 22):</strong> CEN (07:44 AM) ➔ GDL (10:32 AM)<br>
+           <strong>Regreso (Mar 27):</strong> GDL (06:16 AM) ➔ CEN (07:12 AM)</p>
+      </div>
+
+      <div class="card">
+        <h3>🎒 Checklist de Equipaje</h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">Tu progreso se guarda automáticamente.</p>
+        <div id="checklist"></div>
+      </div>
+    </section>
+
+    <!-- TAB: JUEVES 22 -->
+    <section id="dia1" class="day-panel">
+      <div class="card">
+        <div class="card-img-header" style="background-image: url('https://images.unsplash.com/photo-1545239351-ef35f43d514b?auto=format&fit=crop&w=800&q=80')"></div>
+        <span class="badge">10:32 AM</span>
+        <h3>Llegada a Guadalajara</h3>
+        <p>Vuelo Volaris aterriza. Dirígete a la zona de plataformas para pedir transporte a Casa Manuel.</p>
+        <div class="actions">
+          <a class="btn btn-uber route-btn" data-dest="Tierra+encantada+3060+Terralta+Tlaquepaque+Jalisco" href="https://www.google.com/maps/dir/?api=1&origin=Aeropuerto+Guadalajara&destination=Tierra+encantada+3060+Terralta+Tlaquepaque+Jalisco" target="_blank">🚕 Ruta a Casa Manuel</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-img-header" style="background-image: url('https://images.unsplash.com/photo-1512428813834-c702c7702b78?auto=format&fit=crop&w=800&q=80')"></div>
+        <span class="badge">04:30 PM - 06:30 PM</span>
+        <h3>Templo Bonsái Café</h3>
+        <p>Tarde relajada de café de especialidad rodeados de naturaleza, plantas y bonsáis en la Colonia Americana.</p>
+        <div class="actions">
+          <a class="btn btn-maps" href="https://www.google.com/maps/search/?api=1&query=Templo+Bonsai+Cafe+Guadalajara" target="_blank">📍 Ver Ubicación</a>
+          <a class="btn btn-uber route-btn" data-dest="Templo+Bonsai+Cafe+Guadalajara" href="https://www.google.com/maps/dir/?api=1&origin=Tierra+encantada+3060+Terralta+Tlaquepaque+Jalisco&destination=Templo+Bonsai+Cafe+Guadalajara" target="_blank">🚕 Pedir Uber hacia aquí</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB: VIERNES 23 -->
+    <section id="dia2" class="day-panel">
+      <div class="card">
+        <div class="card-img-header" style="background-image: url('https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=800&q=80')"></div>
+        <span class="badge">01:00 PM</span>
+        <h3>Panificadora La Luz de Occidente</h3>
+        <p>Después de pasear por Catedral, pasen a esta panadería histórica por el mejor Pan de Muerto tradicional y conchas.</p>
+        <div class="actions">
+          <a class="btn btn-maps" href="https://www.google.com/maps/search/?api=1&query=Panificadora+La+Luz+de+Occidente+Guadalajara" target="_blank">📍 Ubicación Panificadora</a>
+          <a class="btn btn-uber route-btn" data-dest="Panificadora+La+Luz+de+Occidente+Guadalajara" href="https://www.google.com/maps/dir/?api=1&origin=Tierra+encantada+3060+Terralta+Tlaquepaque+Jalisco&destination=Panificadora+La+Luz+de+Occidente+Guadalajara" target="_blank">🚕 Ruta desde casa/ubicación</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB: SÁBADO 24 -->
+    <section id="dia3" class="day-panel">
+      <div class="card">
+        <div class="card-img-header" style="background-image: url('https://images.unsplash.com/photo-1463936575829-25148e1db1b8?auto=format&fit=crop&w=800&q=80')"></div>
+        <span class="badge">08:30 AM</span>
+        <h3>La Plantería Vivero Café</h3>
+        <p>Desayuno rodeados de naturaleza antes de salir rumbo a las flores. Un ambiente fresco e instagrameable.</p>
+        <div class="actions">
+          <a class="btn btn-maps" href="https://www.google.com/maps/search/?api=1&query=La+Planteria+Vivero+Cafe+Bosques" target="_blank">📍 Ver Vivero</a>
+          <a class="btn btn-uber route-btn" data-dest="La+Planteria+Vivero+Cafe+Bosques" href="https://www.google.com/maps/dir/?api=1&origin=Tierra+encantada+3060+Terralta+Tlaquepaque+Jalisco&destination=La+Planteria+Vivero+Cafe+Bosques" target="_blank">🚕 Navegar al Vivero</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-img-header" style="background-image: url('https://images.unsplash.com/photo-1570784332176-fdd73da66f03?auto=format&fit=crop&w=800&q=80')"></div>
+        <span class="badge">11:00 AM - 02:00 PM</span>
+        <h3>Rancho San Juan Diego (Cempasúchil)</h3>
+        <p>Sesión fotográfica en los campos inmensos de Cempasúchil y girasoles en Tlajomulco.</p>
+        <div class="actions">
+          <a class="btn btn-maps" href="https://www.google.com/maps/search/?api=1&query=Rancho+San+Juan+Diego+Tlajomulco" target="_blank">📍 Ver Campos</a>
+          <a class="btn btn-uber" href="https://www.google.com/maps/dir/?api=1&origin=La+Planteria+Vivero+Cafe+Bosques&destination=Rancho+San+Juan+Diego+Tlajomulco" target="_blank">🚕 Ruta desde Vivero ➔ Campos</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-img-header" style="background-image: url('https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80')"></div>
+        <span class="badge">02:30 PM</span>
+        <h3>Mr. Pampas Guadalajara</h3>
+        <p>Para recuperar energía: cortes al carbón estilo rodizio y buffet libre.</p>
+        <div class="actions">
+          <a class="btn btn-maps" href="https://www.google.com/maps/search/?api=1&query=Mr+Pampas+Guadalajara" target="_blank">📍 Ver Mr. Pampas</a>
+          <a class="btn btn-uber route-btn" data-dest="Mr+Pampas+Guadalajara" href="https://www.google.com/maps/dir/?api=1&origin=Tierra+encantada+3060+Terralta+Tlaquepaque+Jalisco&destination=Mr+Pampas+Guadalajara" target="_blank">🚕 Ruta al Restaurante</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB: DOMINGO 25 -->
+    <section id="dia4" class="day-panel">
+      <div class="card">
+        <div class="card-img-header" style="background-image: url('https://images.unsplash.com/photo-1586985289688-ca3cf47d3e6e?auto=format&fit=crop&w=800&q=80')"></div>
+        <span class="badge">10:30 AM</span>
+        <h3>Cuca y Lupe</h3>
+        <p>Antojo mañanero de conchas artesanales, panes rellenos de temporada y un buen café.</p>
+        <div class="actions">
+          <a class="btn btn-maps" href="https://www.google.com/maps/search/?api=1&query=Cuca+y+Lupe+Guadalajara" target="_blank">📍 Ver Cuca y Lupe</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-img-header" style="background-image: url('https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=800&q=80')"></div>
+        <span class="badge">04:00 PM</span>
+        <h3>Todos Somos Ángeles Rock Fest 2026</h3>
+        <p>Ángeles del Infierno en la Arena Guadalajara. Lleguen temprano para evitar aglomeraciones.</p>
+        <div class="actions">
+          <a class="btn btn-maps" href="https://www.google.com/maps/search/?api=1&query=Arena+Guadalajara" target="_blank">📍 Arena Guadalajara</a>
+          <a class="btn btn-uber route-btn" data-dest="Arena+Guadalajara" href="https://www.google.com/maps/dir/?api=1&origin=Tierra+encantada+3060+Terralta+Tlaquepaque+Jalisco&destination=Arena+Guadalajara" target="_blank">🚕 Uber al Concierto</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB: LUNES 26 -->
+    <section id="dia5" class="day-panel">
+      <div class="card">
+        <div class="card-img-header" style="background-image: url('https://images.unsplash.com/photo-1601004128527-3136dae3e8f6?auto=format&fit=crop&w=800&q=80')"></div>
+        <span class="badge">10:00 AM - 12:30 PM</span>
+        <h3>Bosque Los Colomos y Jardín Japonés</h3>
+        <p>Paseo matutino tranquilo por la naturaleza para recuperarse del concierto. Ideal para recorrer el Jardín Japonés, ver los lagos y alimentar patos y ardillas.</p>
+        <div class="actions">
+          <a class="btn btn-maps" href="https://www.google.com/maps/search/?api=1&query=Bosque+Los+Colomos+Guadalajara" target="_blank">📍 Ubicación Los Colomos</a>
+          <a class="btn btn-uber route-btn" data-dest="Bosque+Los+Colomos+Guadalajara" href="https://www.google.com/maps/dir/?api=1&origin=Tierra+encantada+3060+Terralta+Tlaquepaque+Jalisco&destination=Bosque+Los+Colomos+Guadalajara" target="_blank">🚕 Ruta hacia el Bosque</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-img-header" style="background-image: url('https://images.unsplash.com/photo-1519710164239-da123dc03ef4?auto=format&fit=crop&w=800&q=80')"></div>
+        <span class="badge">01:30 PM en adelante</span>
+        <h3>Plaza Andares / The Landmark</h3>
+        <p>Tarde de compras, arquitectura moderna y buena comida en la zona más exclusiva de Zapopan. Perfecto para comprar recuerditos o disfrutar de un restaurante para la comida de despedida.</p>
+        <div class="actions">
+          <a class="btn btn-maps" href="https://www.google.com/maps/search/?api=1&query=Plaza+Andares+Zapopan" target="_blank">📍 Ver Andares</a>
+          <a class="btn btn-uber" href="https://www.google.com/maps/dir/?api=1&origin=Bosque+Los+Colomos+Guadalajara&destination=Plaza+Andares+Zapopan" target="_blank">🚕 Ruta desde Colomos</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB: REGRESO (MARTES 27) -->
+    <section id="dia6" class="day-panel">
+      <div class="card">
+        <span class="badge">04:15 AM</span>
+        <h3>Rumbo al Aeropuerto (GDL)</h3>
+        <p>Vuelo de regreso sale a las 06:16 AM. Uber de madrugada hacia GDL.</p>
+        <div class="actions">
+          <a class="btn btn-uber route-btn" data-dest="Aeropuerto+Internacional+Guadalajara" href="https://www.google.com/maps/dir/?api=1&origin=Tierra+encantada+3060+Terralta+Tlaquepaque+Jalisco&destination=Aeropuerto+Internacional+Guadalajara" target="_blank">🚕 Uber Casa Manuel ➔ Aeropuerto</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // === SISTEMA DE PESTAÑAS ===
+    function showTab(tabId) {
+      document.querySelectorAll('.day-panel').forEach(p => p.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      
+      const tabs = document.querySelectorAll('.tab');
+      tabs.forEach(t => t.classList.remove('active'));
+      event.currentTarget.classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // === COPIAR AL PORTAPAPELES ===
+    function copiarDireccion() {
+      const texto = "Tierra encantada 3060, Terralta, Tlaquepaque Jalisco 45594";
+      navigator.clipboard.writeText(texto).then(() => {
+        alert("¡Dirección de Casa Manuel copiada! Lista para pegar en Uber o WhatsApp.");
+      });
+    }
+
+    // === GPS DINÁMICO ===
+    let userLat = null, userLon = null;
+    function activarGPS() {
+      const statusText = document.getElementById("gps-status");
+      if (!navigator.geolocation) {
+        statusText.innerText = "Tu navegador no soporta GPS."; return;
+      }
+      
+      statusText.innerText = "Buscando satélites...";
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          userLat = pos.coords.latitude;
+          userLon = pos.coords.longitude;
+          statusText.innerHTML = "✅ <b>GPS Activo.</b> Las rutas ahora se calcularán desde tu ubicación exacta.";
+          
+          // Actualizar dinámicamente TODOS los botones de ruta para usar el GPS actual
+          document.querySelectorAll('.route-btn').forEach(btn => {
+            const destino = btn.getAttribute('data-dest');
+            if(destino) {
+              btn.href = `https://www.google.com/maps/dir/?api=1&origin=${userLat},${userLon}&destination=${destino}`;
+              btn.innerHTML = "🚕 Uber desde mi ubicación";
+            }
+          });
+        },
+        (err) => { statusText.innerText = "❌ GPS denegado o sin señal. Usando Casa Manuel como inicio."; }
+      );
+    }
+
+    // === CHECKLIST INTERACTIVO (Guarda en el navegador) ===
+    const items = [
+      "🎫 Boletos Volaris y pases de abordar",
+      "🎸 Boletos Ángeles del Infierno (Rock Fest)",
+      "🪪 Identificación oficial (INE / Pasaporte)",
+      "📱 Teléfono y Tablet",
+      "🔌 Cargadores y Batería portátil (Powerbank)",
+      "👗 Ropa cómoda (para caminatas, vivero y campos de cempasúchil)",
+      "🖤 Outfit rockero para el concierto",
+      "🧥 Chamarra o suéter ligero (mañanas y noches frescas en GDL)",
+      "🧴 Skincare (Bloqueador solar y crema hidratante)",
+      "💄 Maquillaje y desmaquillante",
+      "🚿 Cuidado personal (cepillo de dientes, desodorante, perfume)",
+      "💇‍♀️ Cuidado del cabello (aceites o cremas para peinar tu balayage)",
+      "💵 Efectivo y tarjetas"
+    ];
+    
+    const listDiv = document.getElementById('checklist');
+    items.forEach((item, idx) => {
+      // Cargar estado de LocalStorage
+      const isDone = localStorage.getItem('chk_'+idx) === 'true';
+      const div = document.createElement('div');
+      div.className = `checklist-item ${isDone ? 'done' : ''}`;
+      div.innerHTML = `<input type="checkbox" id="chk_${idx}" ${isDone ? 'checked' : ''}> <label class="checklist-label" for="chk_${idx}">${item}</label>`;
+      
+      // Guardar cambio
+      div.querySelector('input').addEventListener('change', (e) => {
+        const checked = e.target.checked;
+        localStorage.setItem('chk_'+idx, checked);
+        checked ? div.classList.add('done') : div.classList.remove('done');
+      });
+      listDiv.appendChild(div);
+    });
+  </script>
+</body>
+</html>
